@@ -1,0 +1,945 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>YardMaid</title>
+<meta name="theme-color" content="#2C5E38">
+<meta name="description" content="Book eco-friendly yard care and home cleaning in San Diego.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="YardMaid">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: one app shell. Phone frame on wide screens, full-bleed on phones.
+   Role switcher on top swaps Guest, Business and New-business views over one shared data set. */
+:root{
+  --bg:#F7F3EC; --surface:#FFFFFF; --surface-2:#EFE9DB; --line:#E2DBC9;
+  --text:#22301F; --soft:#5A6652;
+  --brand:#34A853; --brand-light:#5BC86A; --brand-deep:#2C5E38;
+  --accent:#2C5E38; --on-accent:#FFFFFF;
+  --btn-a:#2A8A45; --btn-b:#21653A;
+  --tint:#E3F2DB; --tint-text:#2C5E38;
+  --warn-bg:#FBF0D5; --warn:#7A4E00;
+  --bad-bg:#F8E1DA; --bad:#A33B1E;
+  --info-bg:#E4ECF4; --info:#2F4F73;
+  --star:#D69E1F; --bezel:#17241A;
+  --shadow:0 30px 60px -26px rgba(30,51,36,.4);
+  --f-display:'Nunito',ui-rounded,'Segoe UI',system-ui,sans-serif;
+  --f-body:'Nunito Sans','Segoe UI',system-ui,-apple-system,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1711; --surface:#17211A; --surface-2:#212E25; --line:#2C3B30;
+    --text:#E6EEE2; --soft:#9DAF98;
+    --accent:#7ED18B; --on-accent:#0F2214;
+    --tint:#1F3A27; --tint-text:#8FDB9B;
+    --warn-bg:#3A2F12; --warn:#F0C766;
+    --bad-bg:#3B1E17; --bad:#F0A08A;
+    --info-bg:#1E2D3D; --info:#9CC3EA;
+    --star:#E3B03B; --bezel:#27382B;
+    --shadow:0 30px 60px -26px rgba(0,0,0,.7);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1711; --surface:#17211A; --surface-2:#212E25; --line:#2C3B30;
+  --text:#E6EEE2; --soft:#9DAF98;
+  --accent:#7ED18B; --on-accent:#0F2214;
+  --tint:#1F3A27; --tint-text:#8FDB9B;
+  --warn-bg:#3A2F12; --warn:#F0C766;
+  --bad-bg:#3B1E17; --bad:#F0A08A;
+  --info-bg:#1E2D3D; --info:#9CC3EA;
+  --star:#E3B03B; --bezel:#27382B;
+  --shadow:0 30px 60px -26px rgba(0,0,0,.7);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;background:var(--bg);color:var(--text);font-family:var(--f-body);font-size:14px;line-height:1.45;
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+  padding-block:12px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+button{font:inherit;color:inherit;cursor:pointer}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance}
+p{margin:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* top: brand + role switcher */
+.top{display:flex;align-items:center;justify-content:center;gap:12px 18px;flex-wrap:wrap;flex:none}
+.lockup{display:flex;align-items:center;gap:8px}
+.mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--brand-light),var(--brand));display:flex;align-items:center;justify-content:center}
+.mark svg{width:18px;height:18px}
+.word{font-family:var(--f-display);font-weight:900;font-size:19px;color:var(--accent);letter-spacing:-.02em}
+.switcher{display:flex;flex-wrap:wrap;justify-content:center;background:var(--surface-2);border:1px solid var(--line);border-radius:20px;padding:3px}
+.switcher button{border:0;background:transparent;border-radius:999px;padding:8px 12px;font-weight:700;font-size:12.5px;color:var(--soft)}
+.switcher button.on{background:var(--accent);color:var(--on-accent)}
+.note{display:none;max-width:380px;text-align:center;color:var(--soft);font-size:12px}
+
+/* app shell */
+.phone{position:relative;flex:1;min-height:0;width:100%;max-width:420px;display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:26px;overflow:hidden}
+.notch{display:none;position:absolute;top:0;left:50%;transform:translateX(-50%);width:116px;height:22px;background:var(--bezel);border-radius:0 0 14px 14px;z-index:5}
+.screen{flex:1;min-height:0;overflow-y:auto;padding:14px 16px 22px;-webkit-overflow-scrolling:touch}
+.screen.enter{animation:rise .28s ease}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.foot{flex:none;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px) * 0);border-top:1px solid var(--line);background:var(--surface);display:flex;flex-direction:column;gap:8px}
+.tabbar{flex:none;display:flex;border-top:1px solid var(--line);background:var(--surface);padding:6px 4px}
+.tab{position:relative;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:0;padding:6px 2px;color:var(--soft);font-size:10.5px;font-weight:700}
+.tab svg{width:21px;height:21px}
+.tab.on{color:var(--accent)}
+.badge{position:absolute;top:1px;left:calc(50% + 6px);min-width:16px;height:16px;border-radius:8px;background:var(--bad);color:var(--bad-bg);font-style:normal;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 4px}
+.toast{position:absolute;left:16px;right:16px;bottom:76px;z-index:20;background:var(--text);color:var(--bg);padding:11px 14px;border-radius:12px;font-weight:700;font-size:13px;text-align:center}
+@media (min-width:700px){
+  .phone{flex:none;height:800px;border:10px solid var(--bezel);border-radius:46px;box-shadow:var(--shadow)}
+  .notch{display:block}
+  .screen{padding-top:34px}
+  .note{display:block}
+}
+
+/* type + small parts */
+.muted{color:var(--soft)}
+.m0{margin:0}
+.big{font-size:16px;font-family:var(--f-display);font-weight:800}
+.hi{font-size:24px;font-weight:800;margin-bottom:2px}
+.lead{margin-bottom:14px}
+.page-t{font-size:22px;font-weight:800;margin:2px 0 14px}
+.sec{display:flex;justify-content:space-between;align-items:baseline;margin:18px 0 10px}
+.sec h3{font-size:15px}
+.sec span{font-size:12px;color:var(--soft);font-weight:700}
+.center{text-align:center}
+.hint{font-size:12px;margin-top:8px}
+.amt{font-weight:800;color:var(--accent);font-family:var(--f-display);white-space:nowrap}
+.star{color:var(--star)}
+
+.bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px}
+.bar-t{font-size:15px;font-weight:800;text-align:center;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-sp{width:34px;flex:none}
+.back{width:34px;height:34px;flex:none;border-radius:10px;border:0;background:var(--surface-2);color:var(--accent);display:flex;align-items:center;justify-content:center}
+.back svg{width:16px;height:16px}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 18px;border-radius:14px;border:1px solid transparent;font-weight:700;font-size:14.5px;width:100%}
+.btn svg{width:17px;height:17px}
+.btn.primary{background:linear-gradient(135deg,var(--btn-a),var(--btn-b));color:#fff}
+.btn.soft{background:var(--surface-2);color:var(--accent);border-color:var(--line)}
+.btn.danger{background:var(--bad-bg);color:var(--bad)}
+.btn.ghost{background:transparent;border-color:var(--line);color:var(--text)}
+.btn.sm{min-height:38px;font-size:13px;border-radius:11px;padding:0 14px;width:auto}
+.btn[disabled]{opacity:.4;pointer-events:none}
+.stack{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.pair{display:flex;gap:8px}
+.pair .btn{flex:1}
+
+.card{display:block;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
+.card.tinted{background:var(--tint);border-color:transparent}
+.card.warnc{background:var(--warn-bg);border-color:transparent;color:var(--warn)}
+.card-h{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
+.row-card{display:flex;gap:12px;align-items:flex-start;font-family:inherit}
+.row-card .grow{min-width:0}
+.grow{flex:1;min-width:0}
+.rc-top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.head{display:flex;gap:12px;align-items:center}
+.avatar svg{width:22px;height:22px}
+.avatar{width:46px;height:46px;border-radius:14px;flex:none;background:linear-gradient(135deg,var(--brand-light),var(--brand));color:#0F2A16;font-family:var(--f-display);font-weight:800;display:flex;align-items:center;justify-content:center}
+.pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.pill{display:inline-flex;align-items:center;font-size:11px;font-weight:800;padding:3px 9px;border-radius:999px;margin-left:0}
+.rate .pill{margin-left:8px}
+.pill.ok{background:var(--tint);color:var(--tint-text)}
+.pill.warn{background:var(--warn-bg);color:var(--warn)}
+.pill.bad{background:var(--bad-bg);color:var(--bad)}
+.pill.mute{background:var(--surface-2);color:var(--soft)}
+.pill.info{background:var(--info-bg);color:var(--info)}
+.rate{margin-top:4px;font-size:12.5px}
+
+.rows{padding-block:6px}
+.r{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid var(--line)}
+.r:last-child{border-bottom:0}
+.r span:first-child{color:var(--soft);flex:none}
+.r span:last-child{text-align:right;font-weight:700;min-width:0;overflow-wrap:anywhere}
+
+.search{display:flex;align-items:center;gap:10px;background:var(--surface-2);border-radius:14px;padding:11px 13px;margin-bottom:12px;color:var(--soft)}
+.search svg{width:16px;height:16px;flex:none}
+.search input{flex:1;min-width:0;border:0;background:transparent;outline:0;font:inherit;color:var(--text)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chips.scroll{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;margin-bottom:6px}
+.chips.scroll::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--surface);color:var(--accent);border-radius:999px;padding:8px 14px;font-weight:700;font-size:12.5px}
+.chip.on{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.seg{display:flex;background:var(--surface-2);border-radius:12px;padding:3px;margin-bottom:14px}
+.seg button{flex:1;border:0;background:transparent;border-radius:10px;padding:9px;font-weight:700;color:var(--soft)}
+.seg button.on{background:var(--surface);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+
+.hero{border-radius:20px;padding:18px;min-height:112px;display:flex;align-items:flex-end;background:linear-gradient(135deg,#2F9C4E,#2C5E38);color:#fff;margin-bottom:12px}
+.hero b{font-family:var(--f-display);font-size:21px;display:block}
+.hero span{opacity:.92;font-size:13px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 6px;text-align:center;min-width:0}
+.stat b{display:block;font-family:var(--f-display);font-size:16px;color:var(--accent)}
+.stat span{font-size:11px;color:var(--soft)}
+.svcline{display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}
+.svcline:last-child{border-bottom:0}
+.review{padding:12px 0;border-bottom:1px solid var(--line)}
+.review:last-child{border-bottom:0}
+.review .rh{display:flex;justify-content:space-between;font-weight:700;margin-bottom:2px}
+.reply{margin-top:8px;padding:9px 11px;border-radius:12px;background:var(--surface-2);font-size:13px}
+
+.field{margin-bottom:14px}
+.field>label,.lab{display:block;font-size:12px;font-weight:800;color:var(--soft);margin-bottom:6px}
+.field input,.field select,.field textarea,.price input{width:100%;font:inherit;color:var(--text);background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:12px 13px}
+.field textarea{resize:vertical;min-height:70px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.days{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.day{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:8px 0;text-align:center;min-width:0}
+.day small{display:block;font-size:10px;color:var(--soft);font-weight:700}
+.day b{font-family:var(--f-display);font-size:15px}
+.day.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.day.on small{color:inherit;opacity:.8}
+.day i{display:block;width:5px;height:5px;border-radius:50%;background:var(--brand);margin:3px auto 0}
+.day.on i{background:var(--on-accent)}
+.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.slot{border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:10px 4px;font-weight:700;font-size:12.5px}
+.slot.on{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.opt{display:flex;gap:11px;align-items:flex-start;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:8px}
+.opt.on{background:var(--tint);border-color:var(--accent)}
+.opt b{display:block}
+.opt span.s{display:block;font-size:12.5px;color:var(--soft)}
+.dot,.box{flex:none;width:20px;height:20px;margin-top:1px;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--on-accent)}
+.dot{border-radius:50%}
+.box{border-radius:6px}
+.box svg{width:13px;height:13px;stroke-width:3}
+.opt.on .dot{border-color:var(--accent);background:radial-gradient(circle,var(--accent) 45%,transparent 50%)}
+.opt.on .box,.svc-row.on .box{border-color:var(--accent);background:var(--accent)}
+.starrow{display:flex;gap:2px;justify-content:center;margin:6px 0 14px}
+.starbtn{background:none;border:0;font-size:36px;line-height:1;color:var(--line);padding:2px 4px}
+.starbtn.on{color:var(--star)}
+.photo{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;border:1px dashed var(--line);border-radius:12px}
+
+.lrow{display:flex;align-items:center;gap:12px;width:100%;padding:13px 0;background:none;border:0;border-bottom:1px solid var(--line);text-align:left}
+.lrow:last-child{border-bottom:0}
+.lrow svg{width:16px;height:16px;color:var(--soft);flex:none}
+.lrow .grow b{display:block}
+.lrow .grow span{font-size:12px;color:var(--soft)}
+.tsw{position:relative;flex:none;width:44px;height:26px;border-radius:14px;background:var(--line);border:0;padding:0}
+.tsw.on{background:var(--accent)}
+.tsw i{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s}
+.tsw.on i{left:21px}
+.tsw.on i{background:var(--on-accent)}
+
+.empty{text-align:center;color:var(--soft);padding:36px 12px}
+.empty svg{width:34px;height:34px;margin-bottom:8px;opacity:.5}
+.empty b{display:block;color:var(--text);margin-bottom:2px}
+.done-wrap{display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:34px;gap:6px}
+.done-badge{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--btn-a),var(--btn-b));color:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.done-badge svg{width:32px;height:32px;stroke-width:3}
+
+/* chat */
+.ctx{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;background:var(--surface-2);border:0;border-radius:12px;padding:10px 12px;font-size:12.5px;font-weight:700;text-align:left}
+.ctx svg{width:14px;height:14px;flex:none;color:var(--soft)}
+.demo{font-size:11.5px;color:var(--soft);margin:8px 0 12px;text-align:center}
+.msgs{display:flex;flex-direction:column;gap:8px}
+.bub{max-width:82%;padding:9px 12px;border-radius:16px;overflow-wrap:anywhere}
+.bub small{display:block;font-size:10.5px;opacity:.65;margin-top:2px}
+.bub.me{align-self:flex-end;background:var(--accent);color:var(--on-accent);border-bottom-right-radius:5px}
+.bub.them{align-self:flex-start;background:var(--surface-2);border-bottom-left-radius:5px}
+.quick{display:flex;gap:6px;overflow-x:auto}
+.quick::-webkit-scrollbar{display:none}
+.composer{display:flex;gap:8px}
+.composer input{flex:1;min-width:0;font:inherit;color:var(--text);background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:0 14px;min-height:44px}
+.send{width:44px;height:44px;border-radius:14px;border:0;background:linear-gradient(135deg,var(--btn-a),var(--btn-b));color:#fff;display:flex;align-items:center;justify-content:center;flex:none}
+.send svg{width:18px;height:18px}
+.thread .rc-top small{color:var(--soft);font-weight:600}
+.thread .snip{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* onboarding */
+.prog{height:6px;background:var(--surface-2);border-radius:6px;overflow:hidden}
+.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--brand-light),var(--brand));transition:width .3s}
+.step-l{font-size:12px;margin:8px 0 14px;font-weight:700}
+.svc-row{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:8px;background:var(--surface)}
+.svc-row.on{border-color:var(--accent);background:var(--tint)}
+.svc-t{flex:1;min-width:0;display:flex;align-items:center;gap:10px;background:none;border:0;text-align:left;padding:2px 0;font-weight:700}
+.price{display:flex;align-items:center;gap:4px;width:92px;flex:none}
+.price input{padding:8px 10px}
+.uprow{display:flex;align-items:center;gap:12px}
+.chk{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}
+.chk:last-child{border-bottom:0}
+.chk i{flex:none;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:11px;font-weight:800}
+.chk i.ok{background:var(--accent);color:var(--on-accent)}
+.chk i.wait{background:var(--warn-bg);color:var(--warn)}
+.chk i svg{width:12px;height:12px;stroke-width:3}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<header class="top">
+  <div class="lockup">
+    <span class="mark"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 11.5L12 4l9 7.5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 19c-3.2 0-5-2-5-4.6 0-3 3-5 5-6 2 1 5 3 5 6 0 2.600-1.800 4.600-5 4.600z" fill="#fff"/></svg></span>
+    <span class="word">YardMaid</span>
+  </div>
+  <div class="switcher" role="group" aria-label="Preview as">
+    <button id="m-guest" class="on" onclick="setMode('guest')">Guest</button>
+    <button id="m-business" onclick="setMode('business')">Provider</button>
+    <button id="m-manager" onclick="setMode('manager')">Property manager</button>
+    <button id="m-onboard" onclick="setMode('onboard')">New provider</button>
+  </div>
+</header>
+
+<main class="phone">
+  <div class="notch"></div>
+  <div class="screen" id="screen"></div>
+  <div class="foot" id="foot" hidden></div>
+  <nav class="tabbar" id="tabbar" hidden></nav>
+  <div class="toast" id="toast" hidden role="status"></div>
+</main>
+<p class="note">Clickable prototype with sample data. Nothing is booked or charged. Guest, Provider and Property manager share the same bookings, so an action on one side shows up on the others.</p>
+
+<script>
+'use strict';
+/* ---------- icons ---------- */
+const ic=p=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+const I={
+  home:ic('<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>'),
+  cal:ic('<rect x="4" y="5" width="16" height="16" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/>'),
+  chat:ic('<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>'),
+  user:ic('<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>'),
+  wallet:ic('<path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>'),
+  search:ic('<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>'),
+  back:ic('<path d="M15 18l-6-6 6-6"/>'),
+  check:ic('<path d="M20 6L9 17l-5-5"/>'),
+  send:ic('<path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/>'),
+  chev:ic('<path d="M9 6l6 6-6 6"/>'),
+  building:ic('<path d="M4 21V5a1 1 0 011-1h8a1 1 0 011 1v16"/><path d="M14 9h5a1 1 0 011 1v11"/><path d="M8 8h2M8 12h2M8 16h2M3 21h18"/>')
+};
+
+/* ---------- sample data ---------- */
+const GUEST='Jordan Reyes', MGR='Coastal Property Group', ME_PID=1, NOW_H=19; // prototype clock: Wed Nov 4, 7 PM
+const DAYS=[{off:1,dow:'Thu',n:5,label:'Thu, Nov 5'},{off:2,dow:'Fri',n:6,label:'Fri, Nov 6'},{off:3,dow:'Sat',n:7,label:'Sat, Nov 7'},{off:4,dow:'Sun',n:8,label:'Sun, Nov 8'},{off:5,dow:'Mon',n:9,label:'Mon, Nov 9'},{off:6,dow:'Tue',n:10,label:'Tue, Nov 10'}];
+const SLOTS=[{t:'9:00 AM',h:9},{t:'11:00 AM',h:11},{t:'1:00 PM',h:13},{t:'3:00 PM',h:15},{t:'5:00 PM',h:17},{t:'7:00 PM',h:19}];
+const PROVIDERS=[
+  {id:1,kind:'yard',name:'Marisol Diaz',role:'Lawn care and landscaping',rating:4.9,reviews:132,price:45,eco:true,services:[['Standard mow & edge',45],['Full yard cleanup',120],['Seasonal landscaping',180]],reviewsList:[]},
+  {id:2,kind:'clean',name:'Devon Clarke',role:'Home cleaning',rating:4.8,reviews:98,price:80,eco:true,services:[['Standard clean (2hr)',80],['Deep clean (4hr)',160],['Move-out clean',210]],reviewsList:[['Priya S.','Thorough. Even cleaned inside the oven without being asked.'],['Marcus L.','Reliable and easy to rebook every two weeks.']]},
+  {id:3,kind:'yard',name:'Sam Okafor',role:'Garden design',rating:4.7,reviews:54,price:50,eco:false,services:[['Consultation',50],['Garden bed redesign',220],['Irrigation setup',300]],reviewsList:[['Julie W.','Sam redesigned our front bed and the curb appeal changed completely.']]},
+  {id:4,kind:'clean',name:'Nina Torres',role:'Deep cleaning specialist',rating:5.0,reviews:76,price:60,eco:true,services:[['Deep clean (whole home)',110],['Carpet & upholstery',70],['Window cleaning',60]],reviewsList:[['Ben H.','Best deep clean this house has had. Worth every dollar.']]}
+];
+const B=[
+  {id:'b1',pid:1,cust:GUEST,svc:'Full yard cleanup',price:120,dayOff:2,time:'9:00 AM',hour:9,addr:'1420 Maple Grove Ave, San Diego',status:'confirmed'},
+  {id:'b2',pid:2,cust:GUEST,svc:'Standard clean (2hr)',price:80,past:'Tue, Oct 27',addr:'1420 Maple Grove Ave, San Diego',status:'completed'},
+  {id:'b3',pid:4,cust:GUEST,svc:'Deep clean (whole home)',price:110,past:'Tue, Oct 13',addr:'1420 Maple Grove Ave, San Diego',status:'completed',review:{stars:5,text:'Spotless. Nina checked every room twice.',tags:['Thorough','Eco-friendly'],reply:null}},
+  {id:'b4',pid:1,cust:'Priya S.',svc:'Standard mow & edge',price:45,dayOff:1,time:'11:00 AM',hour:11,addr:'88 Orchard Ln, San Diego',status:'confirmed'},
+  {id:'b5',pid:1,cust:'Angela T.',svc:'Seasonal landscaping',price:180,dayOff:3,time:'1:00 PM',hour:13,addr:'2207 Juniper St, San Diego',status:'requested'},
+  {id:'b6',pid:1,cust:'Marcus L.',svc:'Standard mow & edge',price:45,dayOff:5,time:'9:00 AM',hour:9,addr:'915 Sutter Ave, San Diego',status:'requested'},
+  {id:'b7',pid:1,cust:'Ben H.',svc:'Full yard cleanup',price:120,past:'Fri, Oct 30',addr:'4410 Cedar Way, San Diego',status:'completed',dispute:{issue:'Work incomplete',details:'The back hedge was not trimmed.',outcome:'partial',stage:'open',offer:null,note:'',resolution:''}},
+  {id:'b8',pid:1,cust:'Chris P.',svc:'Standard mow & edge',price:45,past:'Thu, Oct 22',addr:'301 Palm St, San Diego',status:'completed',review:{stars:5,text:'Fast, and the lawn looks sharp.',tags:['On time'],reply:null}},
+  {id:'b9',pid:1,cust:'Angela T.',svc:'Full yard cleanup',price:120,past:'Fri, Oct 9',addr:'2207 Juniper St, San Diego',status:'completed',review:{stars:4,text:'Great work. Arrived a little late.',tags:['Thorough'],reply:'Thanks Angela, sorry about the delay. See you next time.'}},
+  {id:'m1',pid:1,cust:MGR,prop:'Mission Terrace HOA',repeat:'Monthly',ref:'WO-2291',svc:'Seasonal landscaping',price:180,dayOff:4,time:'9:00 AM',hour:9,addr:'715 Mission Terrace Ct, San Diego',status:'confirmed'},
+  {id:'m2',pid:1,cust:MGR,prop:'Palm Court Duplex',repeat:'One time',svc:'Standard mow & edge',price:45,dayOff:6,time:'9:00 AM',hour:9,addr:'4120 Palm Ct, San Diego',status:'requested'},
+  {id:'m3',pid:2,cust:MGR,prop:'Palm Court Duplex',svc:'Move-out clean',price:210,past:'Mon, Oct 26',addr:'4120 Palm Ct, San Diego',status:'completed'},
+  {id:'m4',pid:2,cust:MGR,prop:'Bayview Apartments',svc:'Standard clean (2hr)',price:80,past:'Thu, Oct 15',addr:'2300 Bayview Dr, San Diego',status:'completed',review:{stars:4,text:'Solid turnover clean between tenants.',tags:['On time'],reply:null}}
+];
+const MSG={
+  b1:[{f:'business',x:'Hi Jordan, confirming Friday at 9. Is the side gate unlocked?',t:'Mon'},{f:'guest',x:'Yes, the code is 4821.',t:'Mon'}],
+  b4:[{f:'guest',x:'Could you also edge the front walkway?',t:'Tue'}],
+  m1:[{f:'business',x:'Hi, confirming Sunday at 9 for the HOA planters. Who meets me at the gate?',t:'Tue'}]
+};
+const REPLY_BIZ=['Sounds good, see you then.','Thanks for letting me know.','I can do that. Anything else I should know?'];
+const REPLY_GUEST=['Great, thank you!','That works for me.','Perfect, the gate will be open.'];
+const ECO=['Battery-powered equipment','Plant-based cleaning products','Water-wise landscaping','Green waste recycling'];
+const SVC_ALL=[
+  {k:'Yard',n:'Lawn mow & edge',p:45},{k:'Yard',n:'Hedge & shrub trimming',p:70},{k:'Yard',n:'Full yard cleanup',p:120},{k:'Yard',n:'Seasonal landscaping',p:180},{k:'Yard',n:'Irrigation repair',p:90},
+  {k:'Cleaning',n:'Standard clean (2 hr)',p:80},{k:'Cleaning',n:'Deep clean (4 hr)',p:160},{k:'Cleaning',n:'Move-out clean',p:210},{k:'Cleaning',n:'Window cleaning',p:60}
+];
+const AREAS=['Downtown','North Park','Hillcrest','La Jolla','Pacific Beach','Ocean Beach','Point Loma','Mission Valley','Clairemont','Normal Heights','Kearny Mesa','Chula Vista'];
+const DOW=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const OB_STEPS=['Your business','Services & prices','Where & when','Verification','Payouts & plan','Review'];
+
+/* ---------- state ---------- */
+const newOb=()=>({name:'',type:'Both',team:'Just me',eco:[],services:{},areas:[],days:['Mon','Tue','Wed','Thu','Fri'],start:'8:00 AM',end:'5:00 PM',idDone:false,insDone:false,consent:false,bank:false,plan:'free'});
+const S={mode:'guest',stack:[{s:'home',p:{}}],company:false,cat:'All',eco:false,q:'',propF:'',curProp:'p2',bTab:'up',selDay:1,draft:{},notif:true,accepting:true,weekend:false,pro:false,replying:null,ob:newOb(),obStep:0,obDone:false};
+let seq=0,toastT=null;
+
+/* ---------- helpers ---------- */
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money=n=>{n=Math.round(n*100)/100;return '$'+n.toLocaleString('en-US',{minimumFractionDigits:Number.isInteger(n)?0:2,maximumFractionDigits:2})};
+const stars=n=>'★'.repeat(n)+'☆'.repeat(5-n);
+const prov=id=>PROVIDERS.find(p=>p.id===id);
+const bk=id=>B.find(b=>b.id===id);
+const dayBy=o=>DAYS.find(d=>d.off===o);
+const when=b=>b.dayOff?dayBy(b.dayOff).label+' · '+b.time:b.past;
+const hoursOut=b=>b.dayOff?b.dayOff*24+(b.hour-NOW_H):null;
+const first=n=>n.split(' ')[0];
+const initials=n=>n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+const shortName=n=>{const p=n.split(' ');return p.length>1&&p[1].length>2?p[0]+' '+p[1][0]+'.':n};
+const pay=b=>Math.round(b.price*85)/100;
+const isUp=b=>b.status==='requested'||b.status==='confirmed';
+const me=()=>S.company?MGR:GUEST;
+const mine=()=>S.mode==='guest'?B.filter(b=>b.cust===me()):B.filter(b=>b.pid===ME_PID);
+const other=b=>S.mode==='guest'?prov(b.pid).name:b.cust;
+const cur=()=>S.stack[S.stack.length-1];
+const chip=(label,on,js)=>`<button type="button" class="chip ${on?'on':''}" onclick="${js}">${label}</button>`;
+const opt=(on,title,sub,js,check)=>`<button type="button" class="opt ${on?'on':''}" onclick="${js}"><i class="${check?'box':'dot'}">${on&&check?I.check:''}</i><span class="grow"><b>${title}</b>${sub?`<span class="s">${sub}</span>`:''}</span></button>`;
+const empty=(t,s)=>`<div class="empty">${I.cal}<b>${t}</b><div>${s}</div></div>`;
+const bar=t=>`<div class="bar"><button class="back" aria-label="Back" onclick="back()">${I.back}</button><h2 class="bar-t">${t}</h2><span class="bar-sp"></span></div>`;
+const row=(a,b)=>`<div class="r"><span>${a}</span><span>${b}</span></div>`;
+const tog=(on,js,label)=>`<button type="button" class="tsw ${on?'on':''}" role="switch" aria-checked="${on}" aria-label="${label}" onclick="${js}"><i></i></button>`;
+
+function toast(m){const t=$('toast');t.textContent=m;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{t.hidden=true},2300)}
+
+/* ---------- navigation ---------- */
+function go(s,p){S.stack.push({s,p:p||{}});paint(false)}
+function back(){if(S.stack.length>1)S.stack.pop();paint(false)}
+function tab(k){S.stack=[{s:k,p:{}}];paint(false)}
+function setMode(m){
+  S.company=(m==='manager');S.mode=m==='manager'?'guest':m;S.stack=[{s:'home',p:{}}];S.draft={};S.replying=null;
+  ['guest','business','manager','onboard'].forEach(k=>$('m-'+k).classList.toggle('on',k===m));
+  paint(false);
+}
+const TABS={
+  guest:[['home','Home',I.home],['bookings','Bookings',I.cal],['inbox','Messages',I.chat],['profile','Profile',I.user]],
+  business:[['home','Home',I.home],['schedule','Schedule',I.cal],['inbox','Messages',I.chat],['earnings','Earnings',I.wallet],['profile','Profile',I.user]],
+  company:[['home','Home',I.home],['properties','Properties',I.building],['bookings','Bookings',I.cal],['inbox','Messages',I.chat],['account','Account',I.user]]
+};
+function badge(k){
+  if(S.mode==='guest'&&k==='bookings')return B.filter(b=>b.cust===me()&&((b.pending&&b.pending.by==='business'&&isUp(b))||(b.dispute&&b.dispute.stage==='offered'))).length;
+  if(S.mode==='business'&&k==='home')return B.filter(b=>b.pid===ME_PID&&(b.status==='requested'||(b.pending&&b.pending.by==='guest'&&isUp(b))||(b.dispute&&b.dispute.stage==='open'))).length;
+  return 0;
+}
+function tabsHtml(){
+  const c=cur().s;
+  return TABS[S.mode==='guest'&&S.company?'company':S.mode].map(t=>{const n=badge(t[0]);return `<button class="tab ${t[0]===c?'on':''}" onclick="tab('${t[0]}')">${t[2]}<span>${t[1]}</span>${n?`<i class="badge">${n}</i>`:''}</button>`}).join('');
+}
+function paint(keep){
+  if(keep===undefined)keep=true;
+  const sc=$('screen'),st=sc.scrollTop;
+  let v;
+  if(S.mode==='onboard')v=onboardView();
+  else{const c=cur();const fn=(S.mode==='guest'&&S.company&&R.company[c.s])||(R[S.mode]&&R[S.mode][c.s])||R.shared[c.s];v=fn(c.p||{})}
+  sc.innerHTML=v.html;
+  const f=$('foot');f.innerHTML=v.foot||'';f.hidden=!v.foot;
+  const t=$('tabbar');
+  if(v.tab&&S.mode!=='onboard'){t.innerHTML=tabsHtml();t.hidden=false}else{t.innerHTML='';t.hidden=true}
+  sc.scrollTop=keep?st:0;
+  if(!keep){sc.classList.remove('enter');void sc.offsetWidth;sc.classList.add('enter')}
+  if(v.after)v.after();
+}
+
+/* ---------- shared pieces ---------- */
+function statusPill(b){
+  const g=S.mode==='guest';
+  const m={requested:['warn',g?'Awaiting reply':'New request'],confirmed:['ok','Confirmed'],completed:['mute','Completed'],cancelled:['bad','Cancelled'],declined:['bad','Declined']}[b.status];
+  return `<span class="pill ${m[0]}">${m[1]}</span>`;
+}
+function flags(b){
+  let f='';
+  if(b.pending&&isUp(b))f+='<span class="pill warn">Time change pending</span>';
+  if(b.dispute){const r=b.dispute.stage==='resolved';f+=`<span class="pill ${r?'ok':'bad'}">${r?'Dispute resolved':'Dispute'}</span>`}
+  if(S.mode==='guest'&&b.status==='completed'&&!b.review)f+='<span class="pill info">Review needed</span>';
+  return f;
+}
+function bcard(b){
+  const g=S.mode==='guest',who=other(b);
+  return `<button class="card row-card" onclick="go('booking',{id:'${b.id}'})"><div class="avatar">${initials(who)}</div><div class="grow"><div class="rc-top"><b>${esc(who)}</b><span class="amt">${money(g?b.price:pay(b))}${g?'':' <small class="muted">payout</small>'}</span></div><div class="muted">${esc(b.svc)}</div><div class="muted">${when(b)}</div>${b.prop?`<div class="muted">${esc(b.prop)}</div>`:''}<div class="pills">${statusPill(b)}${flags(b)}</div></div></button>`;
+}
+function payText(b){
+  const g=S.mode==='guest';
+  if(b.status==='requested')return g?'Not charged yet. Payment is taken when the provider accepts.':'Guest is charged when you accept.';
+  if(b.status==='confirmed')return g?'Paid. Held until the job is complete.':'Held by YardMaid until the job is complete.';
+  if(b.status==='declined')return 'Not charged';
+  if(b.status==='cancelled'){
+    if(g)return b.noCharge?'Not charged':b.refund>=b.price?'Refunded in full':`Refunded ${money(b.refund)}. ${money(b.price-b.refund)} late fee kept.`;
+    if(b.cancelBy==='business')return 'Cancelled by you. No payout.';
+    if(b.noCharge)return 'Cancelled before payment.';
+    return b.refund<b.price?`Late-cancel fee payout: ${money(Math.round((b.price-b.refund)*85)/100)}`:'Cancelled by guest. No payout.';
+  }
+  const d=b.dispute;
+  if(d&&d.stage!=='resolved')return g?'Paid. On hold during the dispute.':'Payout on hold during the dispute.';
+  return b.justDone?(g?'Paid':'Payout scheduled'):(g?'Paid':'Paid out');
+}
+function pendingCard(b){
+  if(!b.pending||!isUp(b))return '';
+  const pd=b.pending,lbl=dayBy(pd.dayOff).label+' · '+pd.time,mineReq=pd.by===S.mode;
+  const byName=pd.by==='guest'?b.cust:prov(b.pid).name,otherName=S.mode==='guest'?prov(b.pid).name:b.cust;
+  if(mineReq)return `<div class="card warnc"><b>Waiting for ${esc(first(otherName))}</b><p class="m0">You asked to move this to ${lbl}. The current time stays booked until it is approved.</p><div class="stack"><button class="btn ghost sm" onclick="withdrawChange('${b.id}')">Withdraw request</button></div></div>`;
+  return `<div class="card warnc"><b>${esc(first(byName))} wants a new time</b><p class="m0">Move this to ${lbl}?</p><div class="pair stack"><button class="btn primary" onclick="acceptChange('${b.id}')">Accept</button><button class="btn ghost" onclick="declineChange('${b.id}')">Decline</button></div></div>`;
+}
+function offerText(d,b){return d.offer.kind==='redo'?'a free redo visit':`a ${d.offer.pct}% refund (${money(b.price*d.offer.pct/100)})`}
+function disputeCard(b){
+  const d=b.dispute;if(!d)return '';
+  const g=S.mode==='guest',ask={redo:'a redo visit',partial:'a partial refund',full:'a full refund'}[d.outcome];
+  const lab={open:['bad','Open'],offered:['warn','Offer made'],resolved:['ok','Resolved'],escalated:['info','With YardMaid']}[d.stage];
+  let h=`<div class="card"><div class="card-h"><b>Dispute</b><span class="pill ${lab[0]}">${lab[1]}</span></div><p class="m0"><b>${esc(d.issue)}</b>${d.details?'. '+esc(d.details):''}</p><p class="muted">${g?'You asked':esc(first(b.cust))+' asked'} for ${ask}.</p>`;
+  const pn=esc(first(prov(b.pid).name));
+  if(d.stage==='open')h+=g?`<p>${pn} has up to 48 hours to respond.</p>`:`<p>Respond within 48 hours.</p><div class="stack"><button class="btn primary" onclick="openDispute('${b.id}')">Respond</button></div>`;
+  if(d.stage==='offered'){
+    h+=`<p><b>${g?pn:'You'}</b> offered ${offerText(d,b)}.${d.note?` “${esc(d.note)}”`:''}</p>`;
+    h+=g?`<div class="pair stack"><button class="btn primary" onclick="acceptOffer('${b.id}')">Accept offer</button><button class="btn ghost" onclick="escalate('${b.id}')">Ask YardMaid to review</button></div>`:`<p class="muted">Waiting for the guest to answer.</p>`;
+  }
+  if(d.stage==='resolved')h+=`<p>${esc(d.resolution)}</p>`;
+  if(d.stage==='escalated')h+=`<p>YardMaid support is reviewing both sides. The payout stays on hold until it is decided.</p>`;
+  return h+'</div>';
+}
+function reviewCard(b){
+  const r=b.review;if(!r)return '';
+  const g=S.mode==='guest';
+  return `<div class="card"><div class="card-h"><b>${g?'Your review':esc(shortName(b.cust))+' reviewed this job'}</b><span class="pill ok">Verified booking</span></div><div class="star">${stars(r.stars)}</div><p>${esc(r.text)}</p>${r.reply?`<div class="reply"><b>${g?esc(first(prov(b.pid).name))+' replied':'Your reply'}</b><br>${esc(r.reply)}</div>`:''}</div>`;
+}
+function pickers(d){
+  return `<div class="field"><label>Day</label><div class="days">${DAYS.map(x=>`<button type="button" class="day ${d.dayOff===x.off?'on':''}" onclick="setDay(${x.off})"><small>${x.dow}</small><b>${x.n}</b></button>`).join('')}</div></div>
+  <div class="field"><label>Time</label><div class="slots">${SLOTS.map((s,i)=>`<button type="button" class="slot ${d.time===s.t?'on':''}" onclick="setSlot(${i})">${s.t}</button>`).join('')}</div></div>`;
+}
+function setDay(o){S.draft.dayOff=o;paint()}
+function setSlot(i){S.draft.time=SLOTS[i].t;S.draft.hour=SLOTS[i].h;paint()}
+
+/* ---------- routes ---------- */
+const R={guest:{},business:{},shared:{},company:{}};
+
+/* guest: browse + book */
+function pcard(p){
+  return `<button class="card row-card" onclick="go('provider',{id:${p.id}})"><div class="avatar">${initials(p.name)}</div><div class="grow"><div class="rc-top"><b>${p.name}</b><span class="amt">${money(p.price)}+</span></div><div class="muted">${p.role}</div><div class="rate"><span class="star">★</span> ${p.rating} <span class="muted">(${p.reviews})</span>${p.eco?'<span class="pill ok">Eco-friendly</span>':''}</div></div></button>`;
+}
+function plist(){
+  const q=S.q.trim().toLowerCase();
+  const L=PROVIDERS.filter(p=>{
+    if(S.eco&&!p.eco)return false;
+    if(S.cat==='Yard care'&&p.kind!=='yard')return false;
+    if(S.cat==='Cleaning'&&p.kind!=='clean')return false;
+    if(q&&!(p.name+' '+p.role+' '+p.services.map(s=>s[0]).join(' ')).toLowerCase().includes(q))return false;
+    return true;
+  });
+  return L.length?L.map(pcard).join(''):empty('No providers match yet','Try another category or turn off the eco filter.');
+}
+function fillList(){$('plist').innerHTML=plist()}
+R.guest.home=()=>{
+  const toReview=B.find(b=>b.cust===GUEST&&b.status==='completed'&&!b.review);
+  const next=B.filter(b=>b.cust===GUEST&&b.status==='confirmed').sort((a,b)=>a.dayOff-b.dayOff)[0];
+  let h=`<h1 class="hi">Hi Jordan</h1><p class="muted lead">Trusted help for your home and yard in San Diego.</p>`;
+  h+=`<label class="search">${I.search}<input id="q" placeholder="Search providers or services" value="${esc(S.q)}" oninput="S.q=this.value;fillList()" autocomplete="off"></label>`;
+  h+=`<div class="chips scroll">${['All','Yard care','Cleaning'].map(c=>chip(c,S.cat===c,`S.cat='${c}';paint()`)).join('')}${chip('Eco-friendly only',S.eco,'S.eco=!S.eco;paint()')}</div>`;
+  if(next)h+=`<button class="card tinted" onclick="go('booking',{id:'${next.id}'})"><div class="muted">Up next</div><b class="big">${esc(next.svc)} with ${esc(first(prov(next.pid).name))}</b><div>${when(next)}</div></button>`;
+  if(toReview)h+=`<button class="card" onclick="openReview('${toReview.id}')"><b>How was ${esc(first(prov(toReview.pid).name))}?</b><div class="muted">Leave a review for your ${esc(toReview.svc.toLowerCase())} on ${toReview.past}.</div></button>`;
+  h+=`<div class="sec"><h3>Top rated near you</h3></div><div id="plist">${plist()}</div>`;
+  return {html:h,tab:true};
+};
+R.guest.provider=c=>{
+  const p=prov(c.id);
+  const revs=B.filter(b=>b.pid===p.id&&b.review).map(b=>({n:shortName(b.cust),x:b.review.text,s:b.review.stars})).concat(p.reviewsList.map(r=>({n:r[0],x:r[1],s:5})));
+  let h=bar('Provider');
+  h+=`<div class="hero"><div><b>${p.name}</b><span>${p.role}${p.eco?' · Eco-friendly':''}</span></div></div>`;
+  h+=`<div class="stats"><div class="stat"><b>★ ${p.rating}</b><span>${p.reviews} reviews</span></div><div class="stat"><b>Verified</b><span>ID and background</span></div><div class="stat"><b>~1 hr</b><span>reply time</span></div></div>`;
+  h+=`<div class="sec"><h3>Services</h3></div><div class="card rows">${p.services.map(s=>`<div class="svcline"><span>${s[0]}</span><b class="amt">${money(s[1])}</b></div>`).join('')}</div>`;
+  h+=`<div class="sec"><h3>Reviews</h3><span>Verified bookings only</span></div><div class="card">${revs.map(r=>`<div class="review"><div class="rh"><span>${esc(r.n)}</span><span class="star">${stars(r.s)}</span></div><p class="muted">${esc(r.x)}</p></div>`).join('')||'<p class="muted">No reviews yet.</p>'}</div>`;
+  return {html:h,foot:`<button class="btn primary" onclick="openBook(${p.id})">Request a booking</button>`};
+};
+function openBook(pid){S.draft={pid,svc:0,dayOff:2,hour:null,time:null,addr:'1420 Maple Grove Ave, San Diego',note:'',prop:S.curProp,repeat:'One time',ref:''};go('book')}
+R.guest.book=()=>{
+  const d=S.draft,p=prov(d.pid),sv=p.services[d.svc];
+  let h=bar('Book '+first(p.name));
+  h+=`<div class="field"><label for="b-svc">Service</label><select id="b-svc" onchange="S.draft.svc=+this.value;paint()">${p.services.map((s,i)=>`<option value="${i}" ${i===d.svc?'selected':''}>${s[0]} · ${money(s[1])}</option>`).join('')}</select></div>`;
+  h+=`<div class="field"><label for="b-addr">Address</label><input id="b-addr" value="${esc(d.addr)}" oninput="S.draft.addr=this.value" autocomplete="off"></div>`;
+  h+=pickers(d);
+  h+=`<div class="field"><label for="b-note">Note for ${esc(first(p.name))} (optional)</label><textarea id="b-note" placeholder="Gate code, pets, access notes" oninput="S.draft.note=this.value">${esc(d.note)}</textarea></div>`;
+  h+=`<div class="card rows">${row(esc(sv[0]),money(sv[1]))}${row('Total',`<b>${money(sv[1])}</b>`)}</div><p class="muted hint">You are not charged until ${esc(first(p.name))} accepts. Your payment is then held until the job is complete. Free cancellation up to 24 hours before.</p>`;
+  return {html:h,foot:`<button class="btn primary" ${d.time?'':'disabled'} onclick="sendBooking()">Request booking</button>`};
+};
+function sendBooking(){
+  const d=S.draft,p=prov(d.pid),sv=p.services[d.svc],id='n'+(++seq);
+  const co=S.company,pr=co?(PROPS.find(x=>x.id===d.prop)||PROPS[0]):null;
+  B.unshift({id,pid:p.id,cust:me(),svc:sv[0],price:sv[1],dayOff:d.dayOff,time:d.time,hour:d.hour,addr:co?pr.addr:d.addr,status:'requested',note:d.note,prop:co?pr.name:undefined,repeat:co?d.repeat:undefined,ref:co?d.ref:undefined});
+  S.stack=[{s:'home',p:{}},{s:'sent',p:{id}}];paint(false);
+}
+R.guest.sent=c=>{
+  const b=bk(c.id);
+  const hint=b.pid===ME_PID?'Switch to Provider to accept it as Marisol.':'In this demo only Marisol Diaz’s bookings appear in the Provider view.';
+  return {html:`<div class="done-wrap"><div class="done-badge">${I.check}</div><h2>Request sent</h2><p class="muted">${esc(first(prov(b.pid).name))} will reply soon. You will see the answer in Bookings.</p><p class="muted hint">${hint}</p></div>
+  <div class="stack"><button class="btn primary" onclick="S.stack=[{s:'bookings',p:{}},{s:'booking',p:{id:'${b.id}'}}];paint(false)">View booking</button><button class="btn soft" onclick="tab('home')">Back to home</button></div>`};
+};
+R.guest.bookings=()=>{
+  const L=B.filter(b=>b.cust===GUEST);
+  const up=L.filter(isUp).sort((a,b)=>a.dayOff-b.dayOff),past=L.filter(b=>!isUp(b));
+  const list=S.bTab==='up'?up:past;
+  let h=`<h1 class="page-t">Bookings</h1><div class="seg"><button class="${S.bTab==='up'?'on':''}" onclick="S.bTab='up';paint()">Upcoming · ${up.length}</button><button class="${S.bTab==='past'?'on':''}" onclick="S.bTab='past';paint()">Past · ${past.length}</button></div>`;
+  h+=list.map(bcard).join('')||empty(S.bTab==='up'?'Nothing booked':'No past bookings','Find a provider on Home and send a request.');
+  return {html:h,tab:true};
+};
+R.guest.profile=()=>{
+  let h=`<h1 class="page-t">Profile</h1><div class="hero"><div><b>Jordan Reyes</b><span>San Diego, CA</span></div></div>`;
+  h+=`<div class="card"><div class="lrow"><div class="grow"><b>Eco-friendly filter</b><span>Only show providers with the Eco-friendly badge</span></div>${tog(S.eco,'S.eco=!S.eco;paint()','Eco-friendly filter')}</div>
+  <div class="lrow"><div class="grow"><b>Notifications</b><span>Booking updates and messages</span></div>${tog(S.notif,'S.notif=!S.notif;paint()','Notifications')}</div>
+  <div class="lrow"><div class="grow"><b>Payment method</b><span>Visa ending 4821</span></div></div></div>`;
+  h+=`<div class="card"><button class="lrow" onclick="setMode('onboard')"><div class="grow"><b>Offer your services on YardMaid</b><span>Set up a provider account</span></div>${I.chev}</button><button class="lrow" onclick="setMode('manager')"><div class="grow"><b>Book for a company or property</b><span>Switch to a property manager account</span></div>${I.chev}</button></div>`;
+  return {html:h,tab:true};
+};
+
+/* property manager (company account): same customer flows, plus properties, repeat visits and work orders */
+const PROPS=[
+  {id:'p1',name:'Bayview Apartments',type:'Rental building',addr:'2300 Bayview Dr, San Diego',units:24},
+  {id:'p2',name:'Mission Terrace HOA',type:'HOA common areas',addr:'715 Mission Terrace Ct, San Diego',units:60},
+  {id:'p3',name:'Palm Court Duplex',type:'Rental home',addr:'4120 Palm Ct, San Diego',units:2}
+];
+const TEAM=[{n:'Dana Whitfield',r:'Owner'},{n:'Luis Ortega',r:'Coordinator'}];
+const REPEATS=['One time','Weekly','Every 2 weeks','Monthly'];
+const PTYPES=['Rental building','Rental home','HOA common areas','Office'];
+let pseq=3;
+const cmine=()=>B.filter(b=>b.cust===MGR);
+function needs(b){
+  if(b.pending&&b.pending.by==='business'&&isUp(b))return 'New time proposed';
+  if(b.dispute&&b.dispute.stage==='offered')return 'Offer to review';
+  if(b.status==='completed'&&!b.review)return 'Review needed';
+  return '';
+}
+function bookHere(id){S.curProp=id;tab('home');toast('Choose a provider to book')}
+R.company.home=()=>{
+  const L=cmine(),up=L.filter(isUp).sort((a,b)=>a.dayOff-b.dayOff),act=L.filter(b=>needs(b));
+  const spend=up.reduce((s,b)=>s+b.price,0);
+  let h=`<h1 class="hi">Hi Dana</h1><p class="muted lead">${MGR} · ${PROPS.length} properties</p>`;
+  h+=`<div class="stats"><div class="stat"><b>${money(spend)}</b><span>upcoming spend</span></div><div class="stat"><b>${up.length}</b><span>jobs scheduled</span></div><div class="stat"><b>${act.length}</b><span>need attention</span></div></div>`;
+  if(act.length)h+=`<div class="sec"><h3>Needs attention</h3><span>${act.length}</span></div><div class="card">${act.map(b=>`<button class="lrow" onclick="go('booking',{id:'${b.id}'})"><div class="grow"><b>${needs(b)}</b><span>${esc(b.prop)} · ${esc(prov(b.pid).name)}</span></div>${I.chev}</button>`).join('')}</div>`;
+  h+=`<div class="sec"><h3>Upcoming</h3><span>${up.length}</span></div>`+(up.map(bcard).join('')||empty('Nothing scheduled','Book a service below.'));
+  h+=`<div class="sec"><h3>Book a service</h3></div><div class="chips scroll">${['All','Yard care','Cleaning'].map(c=>chip(c,S.cat===c,`S.cat='${c}';paint()`)).join('')}</div><div id="plist">${plist()}</div>`;
+  return {html:h,tab:true};
+};
+R.company.properties=()=>{
+  let h=`<h1 class="page-t">Properties</h1>`;
+  h+=PROPS.map(p=>{
+    const nx=cmine().filter(b=>b.prop===p.name&&isUp(b)).sort((a,b)=>a.dayOff-b.dayOff)[0];
+    return `<button class="card row-card" onclick="go('property',{id:'${p.id}'})"><div class="avatar">${I.building}</div><div class="grow"><b>${esc(p.name)}</b><div class="muted">${esc(p.type)} · ${p.units} unit${p.units===1?'':'s'}</div><div class="muted">${nx?'Next: '+esc(nx.svc)+' · '+when(nx):'Nothing scheduled'}</div></div></button>`;
+  }).join('');
+  h+=`<button class="btn soft" onclick="openAddProp()">Add a property</button>`;
+  return {html:h,tab:true};
+};
+R.company.property=c=>{
+  const p=PROPS.find(x=>x.id===c.id),L=cmine().filter(b=>b.prop===p.name);
+  let h=bar(esc(p.name));
+  h+=`<div class="card rows">${row('Type',esc(p.type))}${row('Address',esc(p.addr))}${row('Units',p.units)}</div>`;
+  h+=`<div class="sec"><h3>Jobs at this property</h3><span>${L.length}</span></div>`+(L.map(bcard).join('')||empty('No jobs yet','Book a service for this property.'));
+  return {html:h,foot:`<button class="btn primary" onclick="bookHere('${p.id}')">Book a service here</button>`};
+};
+function openAddProp(){S.draft={name:'',type:'Rental building',addr:'',units:''};go('addprop')}
+const apOk=()=>S.draft.name.trim().length>1&&S.draft.addr.trim().length>4;
+const apFootHtml=()=>`<button class="btn primary" ${apOk()?'':'disabled'} onclick="saveProp()">Save property</button>`;
+function apFoot(){$('foot').innerHTML=apFootHtml()}
+R.company.addprop=()=>{
+  const d=S.draft;
+  let h=bar('Add a property');
+  h+=`<div class="field"><label for="ap-n">Property name</label><input id="ap-n" value="${esc(d.name)}" placeholder="For example, Harbor Heights" oninput="S.draft.name=this.value;apFoot()" autocomplete="off"></div>`;
+  h+=`<div class="field"><label>Type</label><div class="chips">${PTYPES.map(t=>chip(t,d.type===t,`S.draft.type='${t}';paint()`)).join('')}</div></div>`;
+  h+=`<div class="field"><label for="ap-a">Address</label><input id="ap-a" value="${esc(d.addr)}" placeholder="Street, city" oninput="S.draft.addr=this.value;apFoot()" autocomplete="off"></div>`;
+  h+=`<div class="field"><label for="ap-u">Number of units</label><input id="ap-u" type="number" inputmode="numeric" min="1" value="${esc(d.units)}" oninput="S.draft.units=this.value"></div>`;
+  h+=`<p class="muted hint">You can add gate codes and access notes each time you book a job.</p>`;
+  return {html:h,foot:apFootHtml()};
+};
+function saveProp(){const d=S.draft;PROPS.push({id:'p'+(++pseq),name:d.name.trim(),type:d.type,addr:d.addr.trim(),units:Math.max(1,parseInt(d.units,10)||1)});toast('Property added');back()}
+R.company.bookings=()=>{
+  const L=cmine().filter(b=>!S.propF||b.prop===S.propF);
+  const up=L.filter(isUp).sort((a,b)=>a.dayOff-b.dayOff),past=L.filter(b=>!isUp(b));
+  const list=S.bTab==='up'?up:past;
+  let h=`<h1 class="page-t">Bookings</h1><div class="chips scroll">${chip('All properties',!S.propF,`S.propF='';paint()`)}${PROPS.map((p,i)=>chip(esc(p.name),S.propF===p.name,`S.propF=PROPS[${i}].name;paint()`)).join('')}</div>`;
+  h+=`<div class="seg"><button class="${S.bTab==='up'?'on':''}" onclick="S.bTab='up';paint()">Upcoming · ${up.length}</button><button class="${S.bTab==='past'?'on':''}" onclick="S.bTab='past';paint()">Past · ${past.length}</button></div>`;
+  h+=list.map(bcard).join('')||empty(S.bTab==='up'?'Nothing booked':'No past bookings','Pick a property and book a service from Home.');
+  return {html:h,tab:true};
+};
+R.company.account=()=>{
+  const L=cmine().filter(b=>b.status!=='cancelled'&&b.status!=='declined'),tot=L.reduce((s,b)=>s+b.price,0);
+  let h=`<h1 class="page-t">Account</h1><div class="hero"><div><b>${MGR}</b><span>Property management · San Diego</span></div></div>`;
+  h+=`<div class="sec"><h3>Spend by property</h3><span>${money(tot)} total</span></div><div class="card rows">${PROPS.map(p=>row(esc(p.name),money(L.filter(b=>b.prop===p.name).reduce((s,b)=>s+b.price,0)))).join('')}</div>`;
+  h+=`<div class="card"><div class="lrow"><div class="grow"><b>Payment method</b><span>Company Visa ending 1107</span></div></div><div class="lrow"><div class="grow"><b>Receipts and statements</b><span>A receipt for every job and a monthly statement</span></div></div></div>`;
+  h+=`<div class="sec"><h3>Team</h3><span>${TEAM.length} people</span></div><div class="card">${TEAM.map(t=>`<div class="lrow"><div class="grow"><b>${esc(t.n)}</b></div><span class="pill ${t.pending?'warn':'ok'}">${t.pending?'Invited':esc(t.r)}</span></div>`).join('')}</div>`;
+  h+=`<div class="stack"><button class="btn soft" onclick="TEAM.push({n:'New teammate',r:'Coordinator',pending:true});toast('Invite sent');paint()">Invite a teammate</button><button class="btn ghost" onclick="setMode('guest')">Switch to personal account</button></div>`;
+  return {html:h,tab:true};
+};
+R.company.book=()=>{
+  const d=S.draft,p=prov(d.pid),sv=p.services[d.svc],pr=PROPS.find(x=>x.id===d.prop)||PROPS[0];
+  let h=bar('Book '+first(p.name));
+  h+=`<div class="field"><label for="b-prop">Property</label><select id="b-prop" onchange="S.draft.prop=this.value;S.curProp=this.value;paint()">${PROPS.map(x=>`<option value="${x.id}" ${x.id===pr.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select><p class="muted hint">${esc(pr.addr)}</p></div>`;
+  h+=`<div class="field"><label for="b-svc">Service</label><select id="b-svc" onchange="S.draft.svc=+this.value;paint()">${p.services.map((s,i)=>`<option value="${i}" ${i===d.svc?'selected':''}>${s[0]} · ${money(s[1])}</option>`).join('')}</select></div>`;
+  h+=pickers(d);
+  h+=`<div class="field"><label>Repeat</label><div class="chips">${REPEATS.map(r=>chip(r,d.repeat===r,`S.draft.repeat='${r}';paint()`)).join('')}</div></div>`;
+  h+=`<div class="field"><label for="b-ref">Work order or PO number (optional)</label><input id="b-ref" value="${esc(d.ref)}" oninput="S.draft.ref=this.value" autocomplete="off"></div>`;
+  h+=`<div class="field"><label for="b-note">Access notes (optional)</label><textarea id="b-note" placeholder="Gate codes, who to meet, areas to skip" oninput="S.draft.note=this.value">${esc(d.note)}</textarea></div>`;
+  h+=`<div class="card rows">${row(esc(sv[0]),money(sv[1]))}${d.repeat!=='One time'?row('Repeats',esc(d.repeat)):''}${row('Per visit',`<b>${money(sv[1])}</b>`)}</div><p class="muted hint">Charged to your company card once ${esc(first(p.name))} accepts, and held until the job is complete. Repeat visits keep the same day and time, and ${esc(first(p.name))} confirms the series. Free cancellation up to 24 hours before each visit.</p>`;
+  return {html:h,foot:`<button class="btn primary" ${d.time?'':'disabled'} onclick="sendBooking()">Request booking</button>`};
+};
+
+/* guest: review + report */
+function openReview(id){S.draft={id,stars:0,tags:[],text:''};go('review',{id})}
+const TAGS=['On time','Thorough','Great communication','Fair price','Eco-friendly'];
+R.guest.review=c=>{
+  const b=bk(c.id),d=S.draft,p=prov(b.pid);
+  let h=bar('Leave a review');
+  h+=`<div class="center"><b class="big">How was ${esc(first(p.name))}?</b><div class="muted">${esc(b.svc)} · ${b.past}</div></div><div class="starrow">${[1,2,3,4,5].map(n=>`<button type="button" class="starbtn ${d.stars>=n?'on':''}" aria-label="${n} star${n>1?'s':''}" onclick="S.draft.stars=${n};paint()">★</button>`).join('')}</div>`;
+  h+=`<div class="field"><label>What stood out?</label><div class="chips">${TAGS.map((t,i)=>chip(t,d.tags.includes(t),`toggleTag(${i})`)).join('')}</div></div>`;
+  h+=`<div class="field"><label for="rv-t">Tell others about it (optional)</label><textarea id="rv-t" oninput="S.draft.text=this.value">${esc(d.text)}</textarea></div><p class="muted hint">Your review is marked as a verified booking.</p>`;
+  return {html:h,foot:`<button class="btn primary" ${d.stars?'':'disabled'} onclick="postReview()">Post review</button>`};
+};
+function toggleTag(i){const t=TAGS[i],a=S.draft.tags;S.draft.tags=a.includes(t)?a.filter(x=>x!==t):a.concat(t);paint()}
+function postReview(){const d=S.draft,b=bk(d.id);b.review={stars:d.stars,text:d.text.trim()||'No comment left.',tags:d.tags,reply:null};toast('Review posted');back()}
+const ISSUES=['Work incomplete','Damage','No-show or very late','Poor quality','Charged incorrectly','Other'];
+function openReport(id){S.draft={id,issue:'',details:'',outcome:'partial',photos:false};go('report',{id})}
+R.guest.report=c=>{
+  const b=bk(c.id),d=S.draft;
+  let h=bar('Report a problem');
+  h+=`<p class="muted lead">${esc(b.svc)} with ${esc(prov(b.pid).name)} · ${b.past}</p>`;
+  h+=`<div class="field"><label>What went wrong?</label><div class="chips">${ISSUES.map((t,i)=>chip(t,d.issue===t,`S.draft.issue=ISSUES[${i}];paint()`)).join('')}</div></div>`;
+  h+=`<div class="field"><label for="rp-d">Details</label><textarea id="rp-d" placeholder="Tell us what happened" oninput="S.draft.details=this.value">${esc(d.details)}</textarea></div>`;
+  h+=`<div class="field"><div class="photo"><span>${d.photos?'2 photos added':'Add photos as evidence'}</span><button type="button" class="btn sm ${d.photos?'soft':'primary'}" onclick="S.draft.photos=!S.draft.photos;paint()">${d.photos?'Remove':'Add'}</button></div></div>`;
+  h+=`<div class="field"><label>What would fix it?</label>${[['redo','Redo the work'],['partial','Partial refund'],['full','Full refund']].map(o=>opt(d.outcome===o[0],o[1],'',`S.draft.outcome='${o[0]}';paint()`)).join('')}</div>`;
+  h+=`<p class="muted hint">${esc(first(prov(b.pid).name))} gets up to 48 hours to respond. If you cannot agree, YardMaid support reviews it.</p>`;
+  return {html:h,foot:`<button class="btn primary" ${d.issue?'':'disabled'} onclick="submitReport()">Submit report</button>`};
+};
+function submitReport(){const d=S.draft,b=bk(d.id);b.dispute={issue:d.issue,details:d.details.trim(),outcome:d.outcome,stage:'open',offer:null,note:'',resolution:'',photos:d.photos};toast('Report sent');back()}
+function acceptOffer(id){const b=bk(id),d=b.dispute;d.stage='resolved';d.resolution=d.offer.kind==='redo'?'Resolved with a free redo visit.':`Resolved with a ${d.offer.pct}% refund (${money(b.price*d.offer.pct/100)}) back to the guest.`;toast('Offer accepted');paint()}
+function escalate(id){bk(id).dispute.stage='escalated';toast('Sent to YardMaid support');paint()}
+
+/* shared: booking detail + changes */
+R.shared.booking=c=>{
+  const b=bk(c.id),g=S.mode==='guest',who=other(b);
+  let h=bar('Booking');
+  h+=`<div class="card head"><div class="avatar">${initials(who)}</div><div class="grow"><b class="big">${esc(who)}</b><div class="muted">${esc(b.svc)}</div><div class="pills">${statusPill(b)}</div></div></div>`;
+  h+=pendingCard(b);
+  h+=`<div class="card rows">${row('When',when(b))}${b.repeat&&b.repeat!=='One time'?row('Repeats',esc(b.repeat)):''}${b.prop?row('Property',esc(b.prop)):''}${row('Where',esc(b.addr))}${g?row('Total',money(b.price)):row('Your payout',`${money(pay(b))} <span class="muted">after 15% commission</span>`)}${row('Payment',payText(b))}${b.note?row('Note',esc(b.note)):''}${b.ref?row('Work order',esc(b.ref)):''}</div>`;
+  h+=disputeCard(b)+reviewCard(b);
+  let a='';
+  if(!g&&b.status==='requested')a+=`<div class="pair"><button class="btn primary" onclick="acceptReq('${b.id}')">Accept</button><button class="btn ghost" onclick="declineReq('${b.id}')">Decline</button></div>`;
+  if(!g&&b.status==='confirmed')a+=`<button class="btn primary" onclick="markDone('${b.id}')">${I.check} Mark job complete</button>`;
+  a+=`<button class="btn soft" onclick="go('chat',{id:'${b.id}'})">${I.chat} Message ${esc(first(who))}</button>`;
+  if(isUp(b)&&!b.pending)a+=`<button class="btn ghost" onclick="openResched('${b.id}')">${g?'Reschedule':'Propose a new time'}</button>`;
+  if(isUp(b)&&(g||b.status==='confirmed'))a+=`<button class="btn danger" onclick="openCancel('${b.id}')">${g?'Cancel booking':'Cancel this job'}</button>`;
+  if(g&&b.status==='completed'){
+    if(!b.review)a+=`<button class="btn primary" onclick="openReview('${b.id}')">Leave a review</button>`;
+    if(!b.dispute)a+=`<button class="btn ghost" onclick="openReport('${b.id}')">Report a problem</button>`;
+    a+=`<button class="btn soft" onclick="go('provider',{id:${b.pid}})">Book again</button>`;
+  }
+  if(!g&&b.review&&!b.review.reply)a+=`<button class="btn soft" onclick="S.replying='${b.id}';go('reviews')">Reply to review</button>`;
+  return {html:h+`<div class="stack">${a}</div>`};
+};
+function acceptReq(id){bk(id).status='confirmed';toast('Booking accepted');paint()}
+function declineReq(id){bk(id).status='declined';toast('Request declined');S.mode==='business'&&cur().s==='booking'?back():paint()}
+function markDone(id){const b=bk(id);b.status='completed';b.justDone=true;b.past=when(b);b.dayOff=null;toast('Marked complete. Payout scheduled.');paint()}
+function acceptChange(id){const b=bk(id),p=b.pending;b.dayOff=p.dayOff;b.time=p.time;b.hour=p.hour;b.pending=null;toast('Time updated');paint()}
+function declineChange(id){bk(id).pending=null;toast('Request declined');paint()}
+function withdrawChange(id){bk(id).pending=null;toast('Request withdrawn');paint()}
+function openResched(id){const b=bk(id);S.draft={id,dayOff:b.dayOff,time:b.time,hour:b.hour};go('resched',{id})}
+R.shared.resched=c=>{
+  const b=bk(c.id),d=S.draft,g=S.mode==='guest',nm=esc(first(other(b)));
+  let h=bar(g?'Reschedule':'Propose a new time');
+  h+=`<div class="card tinted"><div class="muted">Current time</div><b>${when(b)}</b></div>`+pickers(d);
+  h+=`<p class="muted hint">${nm} has to approve the new time. The current time stays booked until then.</p>`;
+  const changed=d.dayOff!==b.dayOff||d.time!==b.time;
+  return {html:h,foot:`<button class="btn primary" ${changed&&d.time?'':'disabled'} onclick="sendResched()">Send request</button>`};
+};
+function sendResched(){const d=S.draft,b=bk(d.id);b.pending={by:S.mode,dayOff:d.dayOff,time:d.time,hour:d.hour};toast('Request sent');back()}
+function openCancel(id){S.draft={id,reason:''};go('cancel',{id})}
+function cancelCalc(b){
+  const g=S.mode==='guest',ho=hoursOut(b);
+  if(!g)return {refund:b.price,msg:'The guest is refunded in full. Cancelling a confirmed job can lower your reliability score and your ranking in search.',noCharge:false};
+  if(b.status==='requested')return {refund:0,msg:'You have not been charged, so there is nothing to refund.',noCharge:true};
+  if(ho>=24)return {refund:b.price,msg:'Free cancellation. This job is more than 24 hours away.',noCharge:false};
+  return {refund:Math.round(b.price*50)/100,msg:'This job starts in less than 24 hours, so a 50% late cancellation fee applies.',noCharge:false};
+}
+R.shared.cancel=c=>{
+  const b=bk(c.id),d=S.draft,g=S.mode==='guest',k=cancelCalc(b);
+  const reasons=g?['Plans changed','Found another provider','Booked by mistake','Other']:['Schedule conflict','Weather or equipment','Guest unreachable','Other'];
+  let h=bar(g?'Cancel booking':'Cancel job');
+  h+=`<div class="card"><b>${esc(b.svc)}</b><div class="muted">${esc(other(b))} · ${when(b)}</div></div>`;
+  h+=`<div class="field"><label>Reason</label><div class="chips">${reasons.map(r=>chip(r,d.reason===r,`S.draft.reason='${r}';paint()`)).join('')}</div></div>`;
+  h+=`<div class="card ${k.refund<b.price&&!k.noCharge?'warnc':'tinted'}"><b>${k.noCharge?'Nothing to refund':g?'You get back '+money(k.refund):'Guest refunded '+money(k.refund)}</b><p class="m0">${k.msg}</p></div>`;
+  return {html:h,foot:`<button class="btn danger" onclick="doCancel()">${g?'Cancel booking':'Cancel job'}</button><button class="btn ghost" onclick="back()">Keep it</button>`};
+};
+function doCancel(){const d=S.draft,b=bk(d.id),k=cancelCalc(b);b.status='cancelled';b.cancelBy=S.mode;b.refund=k.refund;b.noCharge=k.noCharge;b.pending=null;toast(S.mode==='guest'?'Booking cancelled':'Job cancelled');back()}
+
+/* shared: messages */
+function msgsHtml(id){
+  const L=MSG[id]||[];
+  return L.length?L.map(m=>`<div class="bub ${m.f===S.mode?'me':'them'}">${esc(m.x)}<small>${m.t}</small></div>`).join(''):'<p class="muted center">Say hello to start the conversation.</p>';
+}
+function refreshMsgs(id){
+  if(S.mode==='onboard')return;
+  const c=cur();
+  if(c.s==='chat'&&c.p.id===id){const m=$('msgs');if(m){m.innerHTML=msgsHtml(id);const s=$('screen');s.scrollTop=s.scrollHeight}}
+}
+function send(id,text){
+  (MSG[id]=MSG[id]||[]).push({f:S.mode,x:text,t:'Now'});
+  refreshMsgs(id);
+  const from=S.mode;
+  setTimeout(()=>{
+    const to=from==='guest'?'business':'guest',pool=to==='business'?REPLY_BIZ:REPLY_GUEST;
+    MSG[id].push({f:to,x:pool[MSG[id].length%pool.length],t:'Now'});
+    refreshMsgs(id);
+  },1300);
+}
+function sendMsg(e,id){e.preventDefault();const i=$('mi'),v=i.value.trim();if(!v)return false;send(id,v);i.value='';i.focus();return false}
+function sendQuick(id,t){send(id,t)}
+R.shared.inbox=()=>{
+  const L=mine().filter(b=>(MSG[b.id]||[]).length);
+  let h=`<h1 class="page-t">Messages</h1>`;
+  h+=L.map(b=>{const m=MSG[b.id],last=m[m.length-1],who=other(b);return `<button class="card row-card thread" onclick="go('chat',{id:'${b.id}'})"><div class="avatar">${initials(who)}</div><div class="grow"><div class="rc-top"><b>${esc(who)}</b><small>${last.t}</small></div><div class="muted">${esc(b.svc)}</div><div class="snip">${last.f===S.mode?'You: ':''}${esc(last.x)}</div></div></button>`}).join('')||empty('No messages yet','Open a booking and tap Message to start a conversation.');
+  return {html:h,tab:true};
+};
+R.shared.chat=c=>{
+  const b=bk(c.id),g=S.mode==='guest',who=other(b);
+  const quick=g?['Thanks!','Running a few minutes late','Can we move the time?']:['On my way','Running 10 minutes late','Can we move the time?'];
+  const h=bar(esc(who))+`<button class="ctx" onclick="go('booking',{id:'${b.id}'})"><span>${esc(b.svc)} · ${when(b)}</span>${I.chev}</button><p class="demo">Demo: the other side answers automatically. Switch views to reply as them.</p><div class="msgs" id="msgs">${msgsHtml(b.id)}</div>`;
+  const foot=`<div class="quick">${quick.map(q=>`<button type="button" class="chip" data-t="${esc(q)}" onclick="sendQuick('${b.id}',this.dataset.t)">${esc(q)}</button>`).join('')}</div><form class="composer" onsubmit="return sendMsg(event,'${b.id}')"><input id="mi" placeholder="Message ${esc(first(who))}" autocomplete="off" aria-label="Message"><button class="send" aria-label="Send">${I.send}</button></form>`;
+  return {html:h,foot,after:()=>{const s=$('screen');s.scrollTop=s.scrollHeight}};
+};
+
+/* business */
+function reqCard(b){
+  return `<div class="card"><button class="row-card" style="background:none;border:0;padding:0;width:100%;text-align:left" onclick="go('booking',{id:'${b.id}'})"><div class="avatar">${initials(b.cust)}</div><div class="grow"><div class="rc-top"><b>${esc(b.cust)}</b><span class="amt">${money(pay(b))}</span></div><div class="muted">${esc(b.svc)}</div><div class="muted">${when(b)}</div></div></button><div class="pair stack"><button class="btn primary sm" style="flex:1" onclick="acceptReq('${b.id}')">Accept</button><button class="btn ghost sm" style="flex:1" onclick="declineReq('${b.id}')">Decline</button></div></div>`;
+}
+R.business.home=()=>{
+  const mineB=B.filter(b=>b.pid===ME_PID);
+  const reqs=mineB.filter(b=>b.status==='requested');
+  const chg=mineB.filter(b=>b.pending&&b.pending.by==='guest'&&isUp(b));
+  const dis=mineB.filter(b=>b.dispute&&b.dispute.stage==='open');
+  const rev=mineB.filter(b=>b.review&&!b.review.reply);
+  const conf=mineB.filter(b=>b.status==='confirmed').sort((a,b)=>a.dayOff-b.dayOff);
+  const held=conf.reduce((s,b)=>s+pay(b),0);
+  let h=`<h1 class="hi">Hey Marisol</h1><p class="muted lead">Diaz Lawn & Landscape</p>`;
+  h+=`<div class="stats"><div class="stat"><b>${money(held)}</b><span>held for jobs</span></div><div class="stat"><b>${conf.length}</b><span>jobs booked</span></div><div class="stat"><b>★ 4.9</b><span>rating</span></div></div>`;
+  if(dis.length||rev.length){
+    h+=`<div class="card">`;
+    if(dis.length)h+=`<button class="lrow" onclick="go('disputes')"><div class="grow"><b>${dis.length} dispute${dis.length>1?'s':''} need${dis.length>1?'':'s'} a response</b><span>Payout on hold until resolved</span></div>${I.chev}</button>`;
+    if(rev.length)h+=`<button class="lrow" onclick="go('reviews')"><div class="grow"><b>${rev.length} review${rev.length>1?'s':''} to reply to</b><span>Replies show publicly on your profile</span></div>${I.chev}</button>`;
+    h+=`</div>`;
+  }
+  h+=`<div class="sec"><h3>New requests</h3><span>${reqs.length}</span></div>`;
+  h+=reqs.map(reqCard).join('')||empty('No new requests','New booking requests show up here.');
+  if(chg.length){h+=`<div class="sec"><h3>Time change requests</h3><span>${chg.length}</span></div>`+chg.map(bcard).join('')}
+  h+=`<div class="sec"><h3>Up next</h3><span>${conf.length}</span></div>`;
+  h+=conf.map(bcard).join('')||empty('Nothing booked yet','Accepted requests appear here.');
+  return {html:h,tab:true};
+};
+R.business.schedule=()=>{
+  const conf=B.filter(b=>b.pid===ME_PID&&b.status==='confirmed');
+  const day=dayBy(S.selDay),jobs=conf.filter(b=>b.dayOff===S.selDay).sort((a,b)=>a.hour-b.hour);
+  let h=`<h1 class="page-t">Schedule</h1><div class="days">${DAYS.map(x=>`<button type="button" class="day ${S.selDay===x.off?'on':''}" onclick="S.selDay=${x.off};paint()"><small>${x.dow}</small><b>${x.n}</b>${conf.some(b=>b.dayOff===x.off)?'<i></i>':''}</button>`).join('')}</div>`;
+  h+=`<div class="sec"><h3>${day.label}</h3><span>${jobs.length} job${jobs.length===1?'':'s'}</span></div>`;
+  h+=jobs.map(bcard).join('')||empty('Open day','No jobs booked for this day.');
+  h+=`<div class="sec"><h3>Availability</h3></div><div class="card"><div class="lrow"><div class="grow"><b>Accepting new bookings</b><span>Turn off to pause requests</span></div>${tog(S.accepting,'S.accepting=!S.accepting;paint()','Accepting new bookings')}</div><div class="lrow"><div class="grow"><b>Weekend jobs</b><span>Show Saturday and Sunday slots</span></div>${tog(S.weekend,'S.weekend=!S.weekend;paint()','Weekend jobs')}</div></div>`;
+  return {html:h,tab:true};
+};
+R.business.earnings=()=>{
+  const m=B.filter(b=>b.pid===ME_PID);
+  const held=m.filter(b=>b.status==='confirmed').reduce((s,b)=>s+pay(b),0);
+  const sched=m.filter(b=>b.status==='completed'&&b.justDone&&!(b.dispute&&b.dispute.stage!=='resolved')).reduce((s,b)=>s+pay(b),0);
+  const hold=m.filter(b=>b.status==='completed'&&b.dispute&&b.dispute.stage!=='resolved').reduce((s,b)=>s+pay(b),0);
+  let h=`<h1 class="page-t">Earnings</h1><div class="hero"><div><b>${money(2140)}</b><span>Paid out this month</span></div></div>`;
+  h+=`<div class="card rows">${row('Held until jobs finish',money(held))}${row('Payout scheduled',money(sched))}${row('On hold (dispute)',money(hold))}</div>`;
+  h+=`<div class="card rows"><div class="r"><span>Example: a ${money(120)} job</span><span></span></div>${row('Guest pays',money(120))}${row('YardMaid commission (15%)','−'+money(18))}${row('You receive',`<b>${money(102)}</b>`)}</div>`;
+  h+=`<div class="sec"><h3>Recent payouts</h3></div><div class="card rows">${row('Nov 2 · weekly payout',money(540))}${row('Oct 26 · weekly payout',money(610))}${row('Oct 19 · weekly payout',money(495))}</div>`;
+  return {html:h,tab:true};
+};
+R.business.profile=()=>{
+  const m=B.filter(b=>b.pid===ME_PID);
+  const nd=m.filter(b=>b.dispute&&b.dispute.stage==='open').length,nr=m.filter(b=>b.review&&!b.review.reply).length;
+  let h=`<h1 class="page-t">Profile</h1><div class="hero"><div><b>Diaz Lawn & Landscape</b><span>Marisol Diaz · San Diego</span></div></div>`;
+  h+=`<div class="card"><button class="lrow" onclick="go('reviews')"><div class="grow"><b>Reviews</b><span>${nr?nr+' to reply to':'All answered'}</span></div>${I.chev}</button><button class="lrow" onclick="go('disputes')"><div class="grow"><b>Disputes</b><span>${nd?nd+' awaiting your response':'None open'}</span></div>${I.chev}</button></div>`;
+  h+=`<div class="card"><div class="lrow"><div class="grow"><b>YardMaid Pro</b><span>$30 a month. Featured placement and promotion tools.</span></div>${tog(S.pro,'S.pro=!S.pro;paint()','YardMaid Pro')}</div><div class="lrow"><div class="grow"><b>Background check</b><span>Verified · renews Mar 2027</span></div><span class="pill ok">Verified</span></div><div class="lrow"><div class="grow"><b>Payout account</b><span>Bank ending 2290</span></div></div></div>`;
+  return {html:h,tab:true};
+};
+R.business.reviews=()=>{
+  const L=B.filter(b=>b.pid===ME_PID&&b.review);
+  let h=bar('Reviews')+`<div class="stats"><div class="stat"><b>★ 4.9</b><span>average</span></div><div class="stat"><b>${L.length}</b><span>recent</span></div><div class="stat"><b>${L.filter(b=>!b.review.reply).length}</b><span>to reply to</span></div></div>`;
+  h+=L.map(b=>{
+    const r=b.review;
+    let x=`<div class="card"><div class="review" style="padding-top:0"><div class="rh"><span>${esc(shortName(b.cust))}</span><span class="star">${stars(r.stars)}</span></div><div class="muted">${esc(b.svc)} · ${b.past} · Verified booking</div><p>${esc(r.text)}</p></div>`;
+    if(r.reply)x+=`<div class="reply"><b>Your reply</b><br>${esc(r.reply)}</div>`;
+    else if(S.replying===b.id)x+=`<div class="field"><label for="rr">Your reply</label><textarea id="rr" placeholder="Thank ${esc(first(b.cust))} or address their feedback"></textarea></div><div class="pair"><button class="btn primary sm" style="flex:1" onclick="postReply('${b.id}')">Post reply</button><button class="btn ghost sm" style="flex:1" onclick="S.replying=null;paint()">Cancel</button></div>`;
+    else x+=`<button class="btn soft sm" onclick="S.replying='${b.id}';paint()">Reply</button>`;
+    return x+'</div>';
+  }).join('')||empty('No reviews yet','Reviews from verified bookings appear here.');
+  return {html:h};
+};
+function postReply(id){const v=$('rr').value.trim();if(!v)return;bk(id).review.reply=v;S.replying=null;toast('Reply posted');paint()}
+R.business.disputes=()=>{
+  const L=B.filter(b=>b.pid===ME_PID&&b.dispute);
+  return {html:bar('Disputes')+(L.map(b=>`<button class="card row-card" onclick="go('booking',{id:'${b.id}'})"><div class="avatar">${initials(b.cust)}</div><div class="grow"><div class="rc-top"><b>${esc(b.cust)}</b><span class="amt">${money(b.price)}</span></div><div class="muted">${esc(b.dispute.issue)} · ${esc(b.svc)}</div><div class="pills">${flags(b)}</div></div></button>`).join('')||empty('No disputes','Nothing needs your attention.'))};
+};
+const OFFERS=[['redo','Offer a free redo visit'],['r25','Offer a 25% refund'],['r50','Offer a 50% refund'],['full','Offer a full refund'],['contest','Disagree and ask YardMaid to review']];
+function openDispute(id){S.draft={id,offer:'',note:''};go('dispute',{id})}
+R.business.dispute=c=>{
+  const b=bk(c.id),d=S.draft;
+  let h=bar('Respond to dispute')+disputeCard(b).replace(/<div class="stack">.*?<\/div>/,'');
+  h+=`<div class="field"><label>Your response</label>${OFFERS.map(o=>opt(d.offer===o[0],o[1],'',`S.draft.offer='${o[0]}';paint()`)).join('')}</div>`;
+  h+=`<div class="field"><label for="dn">Message to the guest (optional)</label><textarea id="dn" oninput="S.draft.note=this.value">${esc(d.note)}</textarea></div><p class="muted hint">The guest decides whether to accept. If they do not, YardMaid support steps in.</p>`;
+  return {html:h,foot:`<button class="btn primary" ${d.offer?'':'disabled'} onclick="sendOffer()">Send response</button>`};
+};
+function sendOffer(){
+  const d=S.draft,b=bk(d.id),x=b.dispute;
+  if(d.offer==='contest')x.stage='escalated';
+  else{x.stage='offered';x.offer=d.offer==='redo'?{kind:'redo'}:{kind:'refund',pct:d.offer==='r25'?25:d.offer==='r50'?50:100};x.note=d.note.trim()}
+  toast('Response sent');S.stack=[{s:'home',p:{}},{s:'booking',p:{id:b.id}}];paint(false);
+}
+
+/* ---------- new business onboarding ---------- */
+const upRow=(t,s,done,js,on,off)=>`<div class="card uprow"><div class="grow"><b>${t}</b><div class="muted">${s}</div></div><button type="button" class="btn sm ${done?'soft':'primary'}" onclick="${js}">${done?(on||'Uploaded ✓'):(off||'Upload')}</button></div>`;
+function obValid(){
+  const o=S.ob,i=S.obStep;
+  if(i===0)return o.name.trim().length>1;
+  if(i===1)return Object.keys(o.services).length>0;
+  if(i===2)return o.areas.length>0&&o.days.length>0;
+  if(i===3)return o.idDone&&o.consent;
+  if(i===4)return o.bank;
+  return true;
+}
+function obFootHtml(){const i=S.obStep;return `<button class="btn primary" ${obValid()?'':'disabled'} onclick="obGo(1)">${i===OB_STEPS.length-1?'Submit application':'Continue'}</button>`}
+function obFoot(){$('foot').innerHTML=obFootHtml()}
+function obGo(d){if(d>0&&S.obStep===OB_STEPS.length-1){S.obDone=true}else{S.obStep+=d}paint(false)}
+function obEco(i){const a=S.ob.eco;S.ob.eco=a.includes(i)?a.filter(x=>x!==i):a.concat(i);paint()}
+function obSvc(i){if(i in S.ob.services)delete S.ob.services[i];else S.ob.services[i]=SVC_ALL[i].p;paint()}
+function obArea(i){const a=S.ob.areas;S.ob.areas=a.includes(i)?a.filter(x=>x!==i):a.concat(i);paint()}
+function obDay(d){const a=S.ob.days;S.ob.days=a.includes(d)?a.filter(x=>x!==d):a.concat(d);paint()}
+function obToggle(k){S.ob[k]=!S.ob[k];paint()}
+const OB_BODY=[
+  ()=>{const o=S.ob;return `<div class="field"><label for="ob-name">Business name</label><input id="ob-name" value="${esc(o.name)}" placeholder="For example, Sunrise Yard & Home" oninput="S.ob.name=this.value;obFoot()" autocomplete="off"></div>
+  <div class="field"><label>What do you offer?</label><div class="chips">${['Yard care','Cleaning','Both'].map(t=>chip(t,o.type===t,`S.ob.type='${t}';paint()`)).join('')}</div></div>
+  <div class="field"><label>Team size</label><div class="chips">${['Just me','2–5','6–15','16+'].map(t=>chip(t,o.team===t,`S.ob.team='${t}';paint()`)).join('')}</div></div>
+  <div class="field"><label>Eco-friendly practices</label>${ECO.map((t,i)=>opt(o.eco.includes(i),t,'',`obEco(${i})`,true)).join('')}<p class="muted hint">${o.eco.length>=2?'You qualify for the Eco-friendly badge.':'Choose two or more to earn the Eco-friendly badge guests can filter by.'}</p></div>`},
+  ()=>{const o=S.ob;const show=i=>o.type==='Both'||(o.type==='Yard care'&&SVC_ALL[i].k==='Yard')||(o.type==='Cleaning'&&SVC_ALL[i].k==='Cleaning');
+    return `<p class="muted lead">Pick what you offer and set your price. Guests pay this price and YardMaid keeps 15% of each completed job.</p>`+SVC_ALL.map((s,i)=>!show(i)?'':`<div class="svc-row ${i in o.services?'on':''}"><button type="button" class="svc-t" onclick="obSvc(${i})"><i class="box">${i in o.services?I.check:''}</i><span>${s.n}</span></button>${i in o.services?`<label class="price"><span>$</span><input type="number" inputmode="numeric" min="0" value="${o.services[i]}" oninput="S.ob.services[${i}]=+this.value||0" aria-label="Price for ${s.n}"></label>`:''}</div>`).join('')},
+  ()=>{const o=S.ob;const hs=['6:00 AM','7:00 AM','8:00 AM','9:00 AM','10:00 AM'],he=['3:00 PM','4:00 PM','5:00 PM','6:00 PM','7:00 PM'];
+    return `<div class="field"><label>Neighborhoods you serve</label><div class="chips">${AREAS.map((a,i)=>chip(a,o.areas.includes(i),`obArea(${i})`)).join('')}</div></div>
+    <div class="field"><label>Days you work</label><div class="chips">${DOW.map(d=>chip(d,o.days.includes(d),`obDay('${d}')`)).join('')}</div></div>
+    <div class="two"><div class="field"><label for="ob-s">Start</label><select id="ob-s" onchange="S.ob.start=this.value">${hs.map(t=>`<option ${t===o.start?'selected':''}>${t}</option>`).join('')}</select></div><div class="field"><label for="ob-e">End</label><select id="ob-e" onchange="S.ob.end=this.value">${he.map(t=>`<option ${t===o.end?'selected':''}>${t}</option>`).join('')}</select></div></div>`},
+  ()=>{const o=S.ob;return `<p class="muted lead">Every business is verified before it can take bookings. This is what lets guests trust who comes to their home.</p>
+    ${upRow('Government photo ID','Required',o.idDone,"obToggle('idDone')")}
+    ${upRow('Proof of insurance','Optional. Adds an Insured badge.',o.insDone,"obToggle('insDone')")}
+    ${opt(o.consent,'I agree to a background screening','You will get a link from our screening partner to complete it.',"obToggle('consent')",true)}`},
+  ()=>{const o=S.ob;return `<div class="field"><label>Payout account</label>${upRow('Bank account','Set up securely with our payment partner',o.bank,"obToggle('bank')",'Connected ✓','Connect')}</div>
+    <div class="field"><label>Plan</label>${opt(o.plan==='free','Standard · $0 a month','15% commission on each completed job',"S.ob.plan='free';paint()")}${opt(o.plan==='pro','Pro · $30 a month','Featured placement and promotion tools. The 15% commission still applies.',"S.ob.plan='pro';paint()")}</div>`},
+  ()=>{const o=S.ob,n=Object.keys(o.services).length;return `<div class="card rows">${row('Business',esc(o.name)||'—')}${row('Offers',o.type)}${row('Team',o.team)}${row('Services',n+' listed')}${row('Areas',o.areas.length+' neighborhoods')}${row('Hours',`${o.days.length} days · ${o.start} to ${o.end}`)}${row('Eco-friendly badge',o.eco.length>=2?'Yes':'Not yet')}${row('Plan',o.plan==='pro'?'Pro · $30 a month':'Standard')}</div><p class="muted hint">We review every application before it goes live, including ID and background screening. You will be notified in the app.</p>`}
+];
+function onboardView(){
+  const o=S.ob;
+  if(S.obDone){
+    const c=[['ok','Application received'],['wait','Identity check in review'],['wait','Background screening in progress'],['wait','YardMaid profile review']];
+    return {html:`<div class="done-wrap"><div class="done-badge">${I.check}</div><h2>Application submitted</h2><p class="muted">${esc(o.name)} is under review. You can start taking bookings as soon as you are approved.</p></div>
+    <div class="card" style="margin-top:18px">${c.map(x=>`<div class="chk"><i class="${x[0]}">${x[0]==='ok'?I.check:'…'}</i><span>${x[1]}</span></div>`).join('')}</div>
+    <div class="stack"><button class="btn primary" onclick="setMode('business')">Preview the approved provider view</button><button class="btn ghost" onclick="S.obDone=false;S.obStep=5;paint(false)">Edit application</button></div>`};
+  }
+  const i=S.obStep;
+  let h=`<div class="bar"><button class="back" aria-label="Back" style="${i===0?'visibility:hidden':''}" onclick="obGo(-1)">${I.back}</button><h2 class="bar-t">Set up your business</h2><span class="bar-sp"></span></div>`;
+  h+=`<div class="prog" role="progressbar" aria-valuemin="1" aria-valuemax="${OB_STEPS.length}" aria-valuenow="${i+1}"><i style="width:${(i+1)/OB_STEPS.length*100}%"></i></div><p class="muted step-l">Step ${i+1} of ${OB_STEPS.length} · ${OB_STEPS[i]}</p>`;
+  h+=OB_BODY[i]();
+  return {html:h,foot:obFootHtml()};
+}
+
+paint(false);
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('sw.js').catch(function () {});
+  });
+}
+</script>
